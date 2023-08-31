@@ -1,0 +1,61 @@
+name: react-native-android-build-apk
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+  pull_request_review:
+
+jobs:
+  # install-and-test:
+  #   runs-on: ubuntu-latest
+  #   steps:
+  #     - uses: actions/checkout@v3
+  #     - name: Install npm dependencies
+  #       run: |
+  #         npm install
+  build-typescript:
+    # needs: install-and-test
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - name: Install npm dependencies
+        run: |
+          npm install
+      - name: Build typescript
+        run: |
+          npx tsc
+  build-android:
+    needs: build-typescript
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - name: Install npm dependencies
+        run: |
+          npm install
+      # - name: Make gradlew executable
+      #   run: |
+      #     cd android && chmod +x ./gradlew
+      # - name: Debug prints 1
+      #   run: |
+      #     cd android && ls -l
+      # - name: Debug prints 2
+      #   run: |
+      #     cd android/gradle && ls -l
+      # - name: Debug prints 3
+      #   run: |
+      #     cd android/gradle/wrapper/ && ls -l
+      # - name: Update gradle wrapper
+      #   run: |
+      #     cd android && gradle wrapper
+      # - name: Debug prints 4
+      #   run: |
+      #     cd android/gradle/wrapper/ && ls -l
+      - name: Build Android Release
+        run: |
+          cd android && ./gradlew assembleRelease
+      - name: Upload Artifact
+        uses: actions/upload-artifact@v1
+        with:
+          name: app-release.apk
+          path: android/app/build/outputs/apk/release/
